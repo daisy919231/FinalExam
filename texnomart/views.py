@@ -15,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from texnomart.serializers import RegisterSerializer, UserSerializer
+from django.utils.decorators import method_decorator
 # from rest_framework.permissions import IsAuthenticated
 # from rest_framework_simplejwt.authentication import JWTAuthentication
 
@@ -36,6 +37,15 @@ from django.core.cache import cache
 class AllProducts(ListAPIView):
     queryset=Product.objects.all()
     serializer_class=AllProductSerializer
+
+    def get_queryset(self):
+        cache_key='all_products'
+        cached_data=cache.get(cache_key)
+        if not cached_data:
+            queryset=Product.objects.all()
+            cache.set(cache_key, queryset, timeout=60*3)
+            return queryset
+        return cached_data
     
 class AllCategories(ListAPIView):
     queryset=Category.objects.all()
@@ -65,6 +75,15 @@ class CategoryDelete(RetrieveDestroyAPIView):
     serializer_class=CategorySerializer
     lookup_field = 'slug'
 
+    def get_queryset(self):
+        cache_key='add_category'
+        cached_data=cache.get(cache_key)
+        if not cached_data:
+            queryset=Category.objects.get(id=id).all()
+            cache.set(cache_key, queryset, timeout=60*3)
+            return cache
+        return cached_data
+
 # Product part***
 
 class ProductDetail(RetrieveAPIView):
@@ -77,9 +96,25 @@ class ProductDetail(RetrieveAPIView):
         return super().get_serializer(*args, **kwargs)
 
 class ProductEdit(RetrieveUpdateAPIView):
-    queryset=Product.objects.all()
-    serializer_class=AllProductSerializer
-    lookup_field = 'id'  
+    queryset = Product.objects.all()
+    serializer_class = AllProductSerializer
+    lookup_field = 'id'
+
+
+    def get_serializer(self, *args, **kwargs):
+        # Pass the request context to the serializer
+        kwargs['context'] = {'request': self.request}
+        return super().get_serializer(*args, **kwargs)
+            
+def conditional_cache_page(timeout):
+    def decorator(view_func):
+        def _wrapped_view(request, *args, **kwargs):
+            if request.user.is_authenticated:
+                return cache_page(timeout)(view_func)(request, *args, **kwargs)
+            return view_func(request, *args, **kwargs)
+        return _wrapped_view
+    return decorator
+# FAILED!
 
 class ProductDelete(RetrieveDestroyAPIView):
     queryset=Product.objects.all()

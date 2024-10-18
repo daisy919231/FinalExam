@@ -1,0 +1,32 @@
+{
+    "id": 6,
+    "title": "test",
+    "description": "",
+    "price": 2.0,
+    "group": {
+        "id": 2,
+        "title": "\u0422\u0435\u043b\u0435\u0444\u043e\u043d\u044b",
+        "image": {
+    "id": 6,
+    "title": "test",
+    "description": "",
+    "price": 2.0,
+    "group": {
+        "id": 2,
+        "title": "\u0422\u0435\u043b\u0435\u0444\u043e\u043d\u044b",
+        "image": {
+    "id": 6,
+    "title": "test",
+    "description": "",
+    "price": 2.0,
+    "quantity": 0,
+    "slug": "test"
+},
+{
+    "id": 6,
+    "title": "test",
+    "description": "",
+    "price": 2.0,
+    "quantity": 0,
+    "slug": "test"
+},

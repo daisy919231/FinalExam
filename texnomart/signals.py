@@ -9,7 +9,7 @@ from django.forms.models import model_to_dict
 from texnomart.models import Product, Category
 from django.dispatch import receiver
 from config.settings import EMAIL_DEFAULT_SENDER
-from django.contrib.auth import User
+from django.contrib.auth.models import User
 from django.core.mail import send_mail
 
 
@@ -41,15 +41,19 @@ def send_deletion_notification(sender, instance, **kwargs):
     fixture_path = Path(os.path.join(settings.BASE_DIR, "texnomart", "product_data", "products_deleted.json"))
     
     # Convert category to a dictionary
-    category_instance = model_to_dict(instance.category) if instance.category else {}
+    # group_instance = model_to_dict(instance.group) if instance.group else {}
+    # image_url = group_instance.get('image', None)
+    
+    # if image_url:
+    #     return group_instance.image.url
+
     
     data = {
         'id': instance.id,
-        'name': instance.name,
+        'title': instance.title,
         'description': instance.description,
         'price': instance.price,
-        'category': category_instance,
-        'discount': instance.discount,
+        # 'group': group_instance,
         'quantity': instance.quantity,
         'slug': instance.slug
     }
